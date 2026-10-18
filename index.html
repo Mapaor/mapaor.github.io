@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mapaor GH Pages</title>
+  <link href="https://fonts.cdnfonts.com/css/satoshi" rel="stylesheet">
+  <style>
+    body {
+      max-width: 800px;
+      margin: 60px auto;
+      padding: 0 20px;
+      font-family: "Satoshi", system-ui, sans-serif;
+      background: #222;
+      color: #ddd;
+    }
+
+    a { color: #8ab4f8; }
+    li { margin: 12px 0; } /* Add more spacing between list elements */
+    p { color: #aaa; }
+  </style>
+</head>
+<body>
+  <h1>Hi! I'm Mapaor</h1>
+  <p>Most of my repos are personal projects. Some of them are little apps, others are simple packages (for npm or cargo), the majority of them are websites. Almost all websites I have are either selfhosted at my home server or published at Vercel, however I have some static ones as well :)</p>
+
+  <h2>My GitHub Pages</h2>
+  <p><em>Here are my GitHub Pages published websites</em></p>
+  <ul id="projects">
+    <li>Loading projects...</li>
+  </ul>
+
+  <script>
+    async function loadProjects() {
+      const list = document.querySelector("#projects"); // We target where the HTML list
+
+      const response = await fetch("https://api.github.com/users/mapaor/repos?per_page=100&sort=updated");
+      const repos = await response.json();
+      const projects = repos.filter(repo =>
+        !repo.fork && // Don't include forks, only owned repos
+        repo.has_pages && // Fitler GH pages
+        repo.name !== "mapaor.github.io" // Exclude this very same website
+      );
+      list.replaceChildren();
+
+      for (const repo of projects) {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+
+        a.href = `https://mapaor.github.io/${repo.name}/`;
+        a.textContent = repo.name;
+        li.append(a);
+        if (repo.description) {
+          li.append(` — ${repo.description}`);
+        }
+        list.append(li);
+      }
+    }
+
+    // Now let's simply call our function
+    loadProjects();
+  </script>
+</body>
+</html>
